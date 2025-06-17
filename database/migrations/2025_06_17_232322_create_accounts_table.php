@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string("name");
             $table->enum("type", ['cash', 'bank', 'mpesa', 'others']);
-            $table->decimal("balance");
+            $table->decimal("balance", 15, 2)->default();
             $table->timestamps();
         });
     }
