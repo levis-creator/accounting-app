@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Account;
+use App\Models\Category;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +16,9 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->enum('type', ['income', 'expense']);
+            $table->decimal('amount', 15, 2);
+            $table->foreignUuid('account_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('category_id')->constrained()->cascadeOnDelete();
             $table->text('description');
             $table->date('transaction_date');
             $table->timestamps();
