@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('budgets', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->date('month');
+            $table->decimal('limit_amount', 15, 2);
             $table->timestamps();
         });
     }
