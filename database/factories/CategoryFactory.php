@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,25 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => User::factory(), // generates a new user or use existing
+            'name' => $this->faker->word(),
+            'type' => $this->faker->randomElement(['income', 'expense']),
         ];
+    }
+
+    /**
+     * Optional state for income type
+     */
+    public function income(): static
+    {
+        return $this->state(fn() => ['type' => 'income']);
+    }
+
+    /**
+     * Optional state for expense type
+     */
+    public function expense(): static
+    {
+        return $this->state(fn() => ['type' => 'expense']);
     }
 }

@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Budget;
+use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class BudgetFactory extends Factory
 {
+    protected $model = Budget::class;
     /**
      * Define the model's default state.
      *
@@ -17,7 +21,10 @@ class BudgetFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => User::factory(),
+            'category_id' => Category::factory(),
+            'month' => $this->faker->dateTimeBetween('-3 months', '+3 months')->format('Y-m-01'),
+            'limit_amount' => $this->faker->randomFloat(2, 500, 10000),
         ];
     }
 }

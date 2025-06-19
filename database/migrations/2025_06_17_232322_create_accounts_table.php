@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string("name");
+            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
             $table->enum("type", ['cash', 'bank', 'mpesa', 'others']);
             $table->decimal("balance", 15, 2)->default();
             $table->timestamps();

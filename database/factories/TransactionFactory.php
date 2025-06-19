@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Account;
+use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +19,16 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
+        $type = $this->faker->randomElement(['income', 'expense']);
+
         return [
-            //
+            'type' => $type,
+            'amount' => $this->faker->randomFloat(2, 10, 10000),
+            'user_id' => User::factory(),
+            'account_id' => Account::factory(),
+            'category_id' => Category::factory()->state(['type' => $type]),
+            'description' => $this->faker->sentence(),
+            'transaction_date' => $this->faker->dateTimeBetween('-6 months', 'now')->format('Y-m-d'),
         ];
     }
 }

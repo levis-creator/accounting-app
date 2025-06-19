@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class AccountFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->word() . ' Account',
+            'user_id' => User::factory(), // creates a related user automatically
+            'type' => $this->faker->randomElement(['cash', 'bank', 'mpesa', 'others']),
+            'balance' => $this->faker->randomFloat(2, 0, 100000),
         ];
     }
 }

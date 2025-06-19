@@ -17,8 +17,9 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->enum('type', ['income', 'expense']);
             $table->decimal('amount', 15, 2);
-            $table->foreignUuid('account_id')->constrained()->cascadeOnDelete();
-            $table->foreignUuid('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('account_id')->constrained('accounts')->cascadeOnDelete();
+            $table->foreignUuid('category_id')->constrained('categories')->cascadeOnDelete();
             $table->text('description');
             $table->date('transaction_date');
             $table->timestamps();

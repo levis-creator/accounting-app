@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('category_id')->constrained('categories')->cascadeOnDelete();
             $table->date('month');
             $table->decimal('limit_amount', 15, 2);
             $table->timestamps();

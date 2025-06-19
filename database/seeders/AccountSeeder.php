@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AccountSeeder extends Seeder
 {
@@ -13,5 +14,14 @@ class AccountSeeder extends Seeder
     public function run(): void
     {
         //
+    }
+    public function definition(): array
+    {
+        return [
+            'id' => Str::uuid(),
+            'name' => fake()->word() . ' Account',
+            'type' => fake()->randomElement(['cash', 'bank', 'mpesa', 'others']),
+            'balance' => fake()->randomFloat(2, 0, 100000), // e.g., 2.75, 54321.23
+        ];
     }
 }

@@ -1,3 +1,29 @@
+@php
+    $navlist = [
+       [
+        'section_title'=>'Platform',
+        'links'=> [
+                [
+                    'label' => 'Dashboard',
+                    'match' => 'dashboard',
+                    'route' => 'pages.dashboard',
+                    'icon' => 'home'
+                ],
+                [
+                    'label' => 'Accounts',
+                    'match' => 'accounts',
+                    'route' => 'pages.accounts',
+                    'icon' => 'wallet'
+                ], [
+                    'label' => 'Transactions',
+                    'match' => 'transaction',
+                    'route' => 'pages.transactions',
+                    'icon' => 'wallet'
+                ],
+            ]
+        ]
+    ];
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
@@ -7,14 +33,18 @@
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            <a href="{{ route('pages.dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                </flux:navlist.group>
+                @foreach ( $navlist as $section)
+                    <flux:navlist.group :heading="__($section['section_title'])" class="grid">
+                        @foreach ($section['links'] as $link)
+                            <flux:navlist.item :icon="$link['icon']" :href="route($link['route'])" :current="request()->routeIs($link['match'])" wire:navigate>{{ __($link['label']) }}</flux:navlist.item>
+                        @endforeach
+                    </flux:navlist.group>
+                @endforeach
             </flux:navlist>
 
             <flux:spacer />

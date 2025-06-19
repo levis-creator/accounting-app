@@ -2,11 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Account extends Model
 {
     /** @use HasFactory<\Database\Factories\AccountFactory> */
-    use HasFactory;
+    use HasFactory, HasUuids;
+    protected $fillable = [
+        'id',
+        'name',
+        'type',
+        'balance',
+        'user_id', // include only if you have this column
+    ];
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
