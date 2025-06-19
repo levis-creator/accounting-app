@@ -1,4 +1,4 @@
-<?php
+php artisan flux:publish<?php
 
 use Livewire\Volt\Component;
 

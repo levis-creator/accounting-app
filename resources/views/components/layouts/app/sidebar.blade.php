@@ -18,7 +18,17 @@
                     'label' => 'Transactions',
                     'match' => 'transaction',
                     'route' => 'pages.transactions',
-                    'icon' => 'wallet'
+                    'icon' => 'arrow-path'
+                ],[
+                    'label' => 'Categories',
+                    'match' => 'categories',
+                    'route' => 'pages.categories',
+                    'icon' => 'folder'
+                ],[
+                    'label' => 'Budgets',
+                    'match' => 'budgets',
+                    'route' => 'pages.budgets',
+                    'icon' => 'currency-dollar'
                 ],
             ]
         ]
