@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    protected $fillable = [
+        'id',
+        'user_id',
+        'name',
+        'type',
+    ];
+
     /** @use HasFactory<\Database\Factories\CategoryFactory> */
     use HasFactory, HasUuids;
     public function transactions()

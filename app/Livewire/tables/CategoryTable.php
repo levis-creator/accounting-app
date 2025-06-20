@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\tables;
 
-use App\Models\Account;
+use App\Models\Category;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Button;
@@ -12,9 +12,9 @@ use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 
-final class UserTable extends PowerGridComponent
+final class CategoryTable extends PowerGridComponent
 {
-    public string $tableName = 'user-table-vhghfd-table';
+    public string $tableName = 'category-table-thvyy5-table';
 
     public function setUp(): array
     {
@@ -31,7 +31,7 @@ final class UserTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Account::query();
+        return Category::query();
     }
 
     public function relationSearch(): array
@@ -42,13 +42,9 @@ final class UserTable extends PowerGridComponent
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
-            ->add('id')
-            ->add('id')
             ->add('name')
             ->add('type')
-            ->add('balance')
-            ->add('user_id')
-            ->add('created_at_formatted', fn(Account $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'));
+            ->add('created_at_formatted', fn(Category $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'));
     }
 
     public function columns(): array
@@ -62,16 +58,13 @@ final class UserTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Balance', 'balance')
-                ->sortable()
-                ->searchable(),
-
             Column::make('Created at', 'created_at_formatted', 'created_at')
-                ->sortable()
-                ->hidden(), // 👈 This hides it by default but allows toggling visibility
-            Column::action('Action'),
+                ->sortable(),
+
+            Column::action('Action')
         ];
     }
+
     public function filters(): array
     {
         return [
@@ -85,11 +78,11 @@ final class UserTable extends PowerGridComponent
         $this->js('alert(' . $rowId . ')');
     }
 
-    public function actions(Account $row): array
+    public function actions(Category $row): array
     {
         return [
             Button::add('edit')
-                ->slot('Edit ')
+                ->slot('Edit: ')
                 ->id()
                 ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
                 ->dispatch('edit', ['rowId' => $row->id])

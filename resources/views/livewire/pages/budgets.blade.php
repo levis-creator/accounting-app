@@ -1,4 +1,4 @@
-php artisan flux:publish<?php
+<?php
 
 use Livewire\Volt\Component;
 
@@ -7,5 +7,5 @@ new class extends Component {
 }; ?>
 
 <div>
-    //
+    <livewire:tables.budget-table />
 </div>
