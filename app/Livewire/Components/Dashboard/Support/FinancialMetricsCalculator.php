@@ -4,6 +4,7 @@ namespace App\Livewire\Components\Dashboard\Support;
 
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class FinancialMetricsCalculator
 {
@@ -69,11 +70,13 @@ class FinancialMetricsCalculator
 
         foreach ($dates as $date) {
             $incomeSeries[] = (float) Transaction::where('type', 'income')
+                ->where('user_id', Auth::id())
                 ->whereDate('transaction_date', $date)
                 ->sum('amount');
 
             $expenseSeries[] = (float) Transaction::where('type', 'expense')
                 ->whereDate('transaction_date', $date)
+                ->where('user_id', Auth::id())
                 ->sum('amount');
         }
 
@@ -89,9 +92,11 @@ class FinancialMetricsCalculator
         return [
             'revenue' => Transaction::where('type', 'income')
                 ->whereBetween('transaction_date', [$startDate, $endDate])
+                ->where('user_id', Auth::id())
                 ->sum('amount'),
             'expenses' => Transaction::where('type', 'expense')
                 ->whereBetween('transaction_date', [$startDate, $endDate])
+                ->where('user_id', Auth::id())
                 ->sum('amount'),
         ];
     }
@@ -127,6 +132,7 @@ class FinancialMetricsCalculator
     {
         $topCategory = Transaction::selectRaw('category_id, SUM(amount) as total')
             ->where('type', 'expense')
+            ->where('user_id', Auth::id())
             ->whereBetween('transaction_date', [$startDate, $endDate])
             ->groupBy('category_id')
             ->orderByDesc('total')
@@ -144,6 +150,7 @@ class FinancialMetricsCalculator
 
         $results = Transaction::selectRaw('category_id, SUM(amount) as total')
             ->where('type', 'expense')
+            ->where('user_id', Auth::id())
             ->whereBetween('transaction_date', [$dateRange['start'], $dateRange['end']])
             ->groupBy('category_id')
             ->with('category')

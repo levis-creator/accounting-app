@@ -5,6 +5,7 @@ namespace App\Livewire\tables;
 use App\Models\Account;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -31,7 +32,7 @@ final class AccountsTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Account::query();
+        return Account::query()->where('user_id', Auth::id());
     }
 
     public function relationSearch(): array
@@ -74,25 +75,65 @@ final class AccountsTable extends PowerGridComponent
 
     public function filters(): array
     {
-        return [
-            Filter::datetimepicker('created_at'),
-        ];
+        return [];
     }
 
     #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
+    public function edit($row): void
     {
-        $this->js('alert(' . $rowId . ')');
+
+        $rowId = (string)$row['id'];
+        $this->js("Livewire.navigate(`/accounts/{$rowId}/edit`);");
+        $this->dispatch('editAccount', ['rowId' => $rowId]);
+    }
+    #[\Livewire\Attributes\On('view')]
+    public function view($row): void
+    {
+        $rowId = (string) $row['id'];
+        $this->js("Livewire.navigate(`/accounts/{$rowId}`);");
+    }
+
+    #[\Livewire\Attributes\On('delete')]
+    public function delete($row): void
+    {
+        $rowId = (string) $row['id'];
+
+        $account = Account::findOrFail($rowId);
+
+        // Optional: Check if the user owns this account
+        if ($account->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $account->delete();
+
+        $this->dispatch('pg:deleted', [
+            'title' => 'Deleted',
+            'description' => 'The account has been deleted.',
+        ]);
     }
 
     public function actions(Account $row): array
     {
         return [
+            Button::add('view')
+                ->slot('View')
+                ->id()
+                ->class('pg-btn-white text-blue-500 hover:text-white hover:bg-blue-500 border border-blue-500')
+                ->dispatch('view', ['row' => $row]),
+
             Button::add('edit')
                 ->slot('Edit')
                 ->id()
-                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+                ->class('pg-btn-white text-yellow-500 hover:text-white hover:bg-yellow-500 border border-yellow-500')
+                ->dispatch('edit', ['row' => $row]),
+
+            Button::add('delete')
+                ->slot('Delete')
+                ->id()
+                ->class('pg-btn-white text-red-500 hover:text-white hover:bg-red-500 border border-red-500')
+                ->dispatch('delete', ['row' => $row])
+
         ];
     }
 

@@ -17,20 +17,24 @@ class PersonalAccountingSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 5 users
         User::factory(10)->create()->each(function ($user) {
-            // Create 2 accounts per user
+            // ✅ Create accounts with a valid UUID from the user
             $accounts = Account::factory(5)->create([
                 'user_id' => $user->id,
             ]);
 
-            // Create 3 income and 3 expense categories per user
-            $incomeCategories = Category::factory(5)->income()->create(['user_id' => $user->id]);
-            $expenseCategories = Category::factory(5)->expense()->create(['user_id' => $user->id]);
+            // ✅ Create categories
+            $incomeCategories = Category::factory(5)->income()->create([
+                'user_id' => $user->id,
+            ]);
+
+            $expenseCategories = Category::factory(5)->expense()->create([
+                'user_id' => $user->id,
+            ]);
 
             $allCategories = $incomeCategories->merge($expenseCategories);
 
-            // Create budgets for each category for current month
+            // ✅ Create budgets
             foreach ($allCategories as $category) {
                 Budget::factory()->create([
                     'user_id' => $user->id,
@@ -39,7 +43,7 @@ class PersonalAccountingSeeder extends Seeder
                 ]);
             }
 
-            // Create 10 transactions for each user
+            // ✅ Create transactions
             Transaction::factory(10)->create([
                 'user_id' => $user->id,
                 'account_id' => $accounts->random()->id,

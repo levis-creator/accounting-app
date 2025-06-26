@@ -5,6 +5,7 @@ namespace App\Livewire\tables;
 use App\Models\Budget;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -31,7 +32,7 @@ final class BudgetTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Budget::query()->with('category');
+        return Budget::query()->with('category')->where('user_id', Auth::id());
     }
 
     public function relationSearch(): array

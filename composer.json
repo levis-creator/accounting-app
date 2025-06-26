@@ -19,6 +19,7 @@
         "power-components/livewire-powergrid": "^6.4"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15",
         "composer/composer": "^2.8",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",

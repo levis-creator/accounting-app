@@ -18,7 +18,6 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(), // generates a new user or use existing
             'name' => $this->faker->word(),
             'type' => $this->faker->randomElement(['income', 'expense']),
         ];

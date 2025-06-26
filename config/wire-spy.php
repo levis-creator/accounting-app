@@ -15,5 +15,5 @@ return [
      * - 'super' corresponds to the 'Cmd' key on macOS and the 'Ctrl' key on Windows/Linux.
      * - Combine with other keys using dot notation, like 'super.l' for 'Cmd+L' or 'Ctrl+L'.
      */
-    'keybinding' => 'super.l',
+    'keybinding' => 'super.q',
 ];

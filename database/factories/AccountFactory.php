@@ -19,7 +19,6 @@ class AccountFactory extends Factory
     {
         return [
             'name' => $this->faker->word() . ' Account',
-            'user_id' => User::factory(), // creates a related user automatically
             'type' => $this->faker->randomElement(['cash', 'bank', 'mpesa', 'others']),
             'balance' => $this->faker->randomFloat(2, 0, 100000),
         ];

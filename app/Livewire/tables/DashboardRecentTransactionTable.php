@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -41,6 +42,7 @@ final class DashboardRecentTransactionTable extends PowerGridComponent
     {
         return Transaction::query()
             ->with(['category', 'account'])
+            ->where('user_id', Auth::id())
             ->where('transaction_date', '>=', now()->subDays(30))
             ->orderByDesc('transaction_date');
     }

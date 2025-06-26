@@ -20,7 +20,7 @@ new class extends Component {
             <flux:icon :$icon class="stroke-gray-900 dark:stroke-white w-6 h-6" />
         </div>
         <div>
-            <h3 class="text-sm text-gray-500 dark:text-gray-400 mb-1">{{ $title }}</h3>
+            <flux:heading size="xl" level="2" class="text-sm text-gray-500 dark:text-gray-400 mb-1">{{ $title }}</flux:heading>
             <p class="text-xl font-bold text-gray-900 dark:text-white">{{ $value }}</p>
         </div>
     </div>

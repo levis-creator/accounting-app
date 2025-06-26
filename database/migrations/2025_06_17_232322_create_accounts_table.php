@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("name");
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
             $table->enum("type", ['cash', 'bank', 'mpesa', 'others']);
-            $table->decimal("balance", 15, 2)->default();
+            $table->decimal("balance", 15, 2)->default(0.00);
             $table->timestamps();
         });
     }

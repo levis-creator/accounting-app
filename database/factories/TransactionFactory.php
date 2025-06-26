@@ -23,8 +23,8 @@ class TransactionFactory extends Factory
 
         return [
             'type' => $type,
+            'label' => $this->faker->word(),
             'amount' => $this->faker->randomFloat(2, 10, 10000),
-            'user_id' => User::factory(),
             'account_id' => Account::factory(),
             'category_id' => Category::factory()->state(['type' => $type]),
             'description' => $this->faker->sentence(),
