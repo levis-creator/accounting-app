@@ -22,11 +22,7 @@ new class extends Component {
     {
         $this->edit ? $this->form->edit() : $this->form->create();
 
-        $this->redirect(
-            $this->edit
-                ? route('pages.transactions.show', ['transaction' => $this->transactionId])
-                : route('pages.transactions.index')
-        );
+        $this->redirect($this->edit ? route('pages.transactions.show', ['transaction' => $this->transactionId]) : route('pages.transactions.index'));
     }
 
     public function mount(?string $transactionId = null, bool $edit = false, bool $disable = false): void
@@ -35,10 +31,7 @@ new class extends Component {
         $this->edit = $edit;
         $this->disable = $disable;
 
-        $this->types = [
-            ['value' => 'income', 'label' => 'Income'],
-            ['value' => 'expense', 'label' => 'Expense'],
-        ];
+        $this->types = [['value' => 'income', 'label' => 'Income'], ['value' => 'expense', 'label' => 'Expense']];
 
         // Fix: use map to format each account/category as an object with id/name
         $this->accounts = Account::where('user_id', Auth::id())
@@ -55,7 +48,10 @@ new class extends Component {
             $this->form->mount($transactionId);
         }
     }
-
+    public function updatedFormType($value): void
+    {
+        dd($value); // this should now trigger when "type" changes
+    }
     public function goToIndex(): void
     {
         $this->redirect(route('pages.transactions.index'));
@@ -73,76 +69,27 @@ new class extends Component {
 
 
 <x-templates.form :edit="$edit" :disable="$disable" :delete="$delete">
-    <flux:input
-        name="form.label"
-        label="Label"
-        placeholder="e.g. Grocery, Salary, Loan Repayment"
-        wire:model.defer="form.label"
-        :disabled="$disable"
-        required
-    />
+    <flux:input name="form.label" label="Label" placeholder="e.g. Grocery, Salary, Loan Repayment"
+        wire:model.defer="form.label" :disabled="$disable" required />
 
-    <flux:input
-        type="number"
-        step="0.01"
-        name="form.amount"
-        label="Amount"
-        placeholder="0.00"
-        wire:model.defer="form.amount"
-        :disabled="$disable"
-        required
-    />
+    <flux:input type="number" step="0.01" name="form.amount" label="Amount" placeholder="0.00"
+        wire:model.defer="form.amount" :disabled="$disable" required />
 
-    <x-shared.flux-select
-        name="form.type"
-        label="Transaction Type"
-        :disabled="$disable"
-        required
-        :options="$types"
-        optionValue="value"
-        optionLabel="label"
-        wire:model.defer="form.type"
-    />
+    <x-shared.flux-select name="form.type" wire:model="form.type label="Transaction Type" :disabled="$disable" required :options="$types"
+        optionValue="value" optionLabel="label"  data-track="type-change"/>
 
-    <x-shared.flux-select
-        name="form.account_id"
-        label="Account"
-        :disabled="$disable"
-        required
-        :options="$accounts"
-        optionValue="id"
-        optionLabel="name"
-        wire:model.defer="form.account_id"
-    />
+    <x-shared.flux-select name="form.account_id" label="Account" :disabled="$disable" required :options="$accounts"
+        optionValue="id" optionLabel="name" wire:model.defer="form.account_id" />
 
-    <x-shared.flux-select
-        name="form.category_id"
-        label="Category"
-        :disabled="$disable"
-        required
-        :options="$categories"
-        optionValue="id"
-        optionLabel="name"
-        wire:model.defer="form.category_id"
-    />
+    <x-shared.flux-select name="form.category_id" label="Category" :disabled="$disable" required :options="$categories"
+        optionValue="id" optionLabel="name" wire:model.defer="form.category_id" />
 
-    <flux:input
-        type="date"
-        name="form.transaction_date"
-        label="Transaction Date"
-        wire:model.defer="form.transaction_date"
-        :disabled="$disable"
-        required
-    />
+    <flux:input type="date" name="form.transaction_date" label="Transaction Date"
+        wire:model.defer="form.transaction_date" :disabled="$disable" required />
 
     <div class="col-span-1 md:col-span-2">
-        <flux:textarea
-            name="form.description"
-            label="Description"
-            placeholder="Add details..."
-            wire:model.defer="form.description"
-            :disabled="$disable"
-        />
+        <flux:textarea name="form.description" label="Description" placeholder="Add details..."
+            wire:model.defer="form.description" :disabled="$disable" />
     </div>
 
 </x-templates.form>

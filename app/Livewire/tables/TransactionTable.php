@@ -3,9 +3,11 @@
 namespace App\Livewire\tables;
 
 use App\Models\Transaction;
+use App\Services\TransactionService;
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -16,6 +18,13 @@ use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 final class TransactionTable extends PowerGridComponent
 {
     public string $tableName = 'transaction-table';
+
+    protected TransactionService $service;
+
+    public function boot(TransactionService $service): void
+    {
+        $this->service = $service;
+    }
 
     public function setUp(): array
     {
@@ -31,7 +40,8 @@ final class TransactionTable extends PowerGridComponent
     {
         return Transaction::query()
             ->with('account', 'category')
-            ->where('user_id', Auth::id());
+            ->where('user_id', Auth::id()) // ensures only own data is queried
+            ->orderBy('transaction_date', 'desc');
     }
 
     public function relationSearch(): array
@@ -56,38 +66,15 @@ final class TransactionTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('Label', 'label')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Type', 'type')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Amount', 'amount')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Account', 'account')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Category', 'category')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Description', 'description')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Transaction Date', 'transaction_date_formatted', 'transaction_date')
-                ->sortable(),
-
-            Column::make('Created At', 'created_at_formatted', 'created_at')
-                ->hidden(true)
-                ->sortable(),
-
-            Column::action('Action')
+            Column::make('Label', 'label')->sortable()->searchable(),
+            Column::make('Type', 'type')->sortable()->searchable(),
+            Column::make('Amount', 'amount')->sortable()->searchable(),
+            Column::make('Account', 'account')->sortable()->searchable(),
+            Column::make('Category', 'category')->sortable()->searchable(),
+            Column::make('Description', 'description')->sortable()->searchable(),
+            Column::make('Transaction Date', 'transaction_date_formatted', 'transaction_date')->sortable(),
+            Column::make('Created At', 'created_at_formatted', 'created_at')->hidden(true)->sortable(),
+            Column::action('Action'),
         ];
     }
 
@@ -101,30 +88,38 @@ final class TransactionTable extends PowerGridComponent
     #[\Livewire\Attributes\On('view')]
     public function view($row): void
     {
-        $rowId = (string) $row['id'];
-        $this->js("Livewire.navigate(`/transactions/{$rowId}`);");
+        $transaction = Transaction::findOrFail($row['id']);
+
+        if (!Gate::allows('view', $transaction)) {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->js("Livewire.navigate(`/transactions/{$transaction->id}`);");
     }
 
     #[\Livewire\Attributes\On('edit')]
     public function edit($row): void
     {
-        $rowId = (string) $row['id'];
-        $this->js("Livewire.navigate(`/transactions/{$rowId}/edit`);");
-        $this->dispatch('editTransaction', ['rowId' => $rowId]);
-    }
+        $transaction = Transaction::findOrFail($row['id']);
 
-    #[\Livewire\Attributes\On('delete')]
-    public function delete($row): void
-    {
-        $rowId = (string) $row['id'];
-        $transaction = Transaction::findOrFail($rowId);
-
-        if ($transaction->user_id !== Auth::id()) {
+        if (!Gate::allows('update', $transaction)) {
             abort(403, 'Unauthorized');
         }
 
-        $transaction->delete();
+        $this->js("Livewire.navigate(`/transactions/{$transaction->id}/edit`);");
+        $this->dispatch('editTransaction', ['rowId' => $transaction->id]);
+    }
 
+    #[\Livewire\Attributes\On('deleteTransaction')]
+    public function delete($row): void
+    {
+        $transaction = Transaction::findOrFail($row['id']);
+
+        if (!Gate::allows('delete', $transaction)) {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->service->delete($transaction);
         $this->dispatch('pg:deleted', [
             'title' => 'Deleted',
             'description' => 'The transaction has been deleted.',
@@ -133,24 +128,32 @@ final class TransactionTable extends PowerGridComponent
 
     public function actions(Transaction $row): array
     {
-        return [
-            Button::add('view')
+        $actions = [];
+
+        if (Gate::allows('view', $row)) {
+            $actions[] = Button::add('view')
                 ->slot('View')
                 ->id()
                 ->class('pg-btn-white text-blue-500 hover:text-white hover:bg-blue-500 border border-blue-500')
-                ->dispatch('view', ['row' => $row]),
+                ->dispatch('view', ['row' => $row]);
+        }
 
-            Button::add('edit')
+        if (Gate::allows('update', $row)) {
+            $actions[] = Button::add('edit')
                 ->slot('Edit')
                 ->id()
                 ->class('pg-btn-white text-yellow-500 hover:text-white hover:bg-yellow-500 border border-yellow-500')
-                ->dispatch('edit', ['row' => $row]),
+                ->dispatch('edit', ['row' => $row]);
+        }
 
-            Button::add('delete')
+        if (Gate::allows('delete', $row)) {
+            $actions[] = Button::add('delete')
                 ->slot('Delete')
                 ->id()
                 ->class('pg-btn-white text-red-500 hover:text-white hover:bg-red-500 border border-red-500')
-                ->dispatch('delete', ['row' => $row]),
-        ];
+                ->dispatch('deleteTransaction', ['row' => $row]);
+        }
+
+        return $actions;
     }
 }
